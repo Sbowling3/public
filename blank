@@ -1,0 +1,66 @@
+#include <heltec_unofficial.h>
+
+// Define the relay pin (e.g., GPIO 15)
+#define RELAY_PIN 15
+
+// Frequency for LoRa (915 MHz for US)
+#define BAND 915E6
+
+// Specific word to trigger the relay
+const char* triggerWord = "TRIGGER";
+
+void setup() {
+  // Initialize Heltec board (enable display, LoRa, and serial)
+  Heltec.begin(true /*DisplayEnable*/, true /*LoRa*/, true /*Serial*/, true /*PABOOST*/, BAND);
+
+  // Configure relay pin as output
+  pinMode(RELAY_PIN, OUTPUT);
+  digitalWrite(RELAY_PIN, HIGH); // Set HIGH for active-low relay (off state)
+
+  // Display initialization message
+  Heltec.display->clear();
+  Heltec.display->drawString(0, 0, "LoRa Receiver Ready");
+  Heltec.display->display();
+
+  // Set LoRa parameters (optional, adjust as needed)
+  radio.setBandwidth(125.0);  // 125 kHz bandwidth
+  radio.setSpreadingFactor(7); // SF7 for faster data rate
+  radio.setCodingRate(5);     // 4/5 coding rate
+}
+
+void loop() {
+  // Buffer to store received data
+  String receivedData;
+
+  // Try to receive a packet
+  int state = radio.receive(receivedData);
+
+  if (state == RADIOLIB_ERR_NONE) {
+    // Packet received successfully
+    Heltec.display->clear();
+    Heltec.display->drawString(0, 0, "Received: ");
+    Heltec.display->drawString(0, 10, receivedData);
+    
+    // Check if received data matches the trigger word
+    if (receivedData == triggerWord) {
+      Heltec.display->drawString(0, 20, "Relay ON for 1s");
+      digitalWrite(RELAY_PIN, LOW); // Activate relay (LOW for active-low)
+      delay(1000);                  // Keep relay on for 1 second
+      digitalWrite(RELAY_PIN, HIGH); // Deactivate relay
+      Heltec.display->drawString(0, 30, "Relay OFF");
+    } else {
+      Heltec.display->drawString(0, 20, "No match");
+    }
+    
+    Heltec.display->display();
+  } else if (state != RADIOLIB_ERR_RX_TIMEOUT) {
+    // Handle other errors (e.g., CRC error)
+    Heltec.display->clear();
+    Heltec.display->drawString(0, 0, "Receive Error: ");
+    Heltec.display->drawString(0, 10, String(state));
+    Heltec.display->display();
+  }
+
+  // Small delay to prevent excessive CPU usage
+  delay(10);
+}
