@@ -1,1 +1,59 @@
+Heres the working code for the sender. Can you make the receiver code in similar format? 
+#define RADIOLIB_DEBUG_DISABLED  // Disable noisy debug output
+#define HELTEC_POWER_BUTTON
+#include <heltec_unofficial.h>
 
+#define FREQUENCY           905.2
+#define BANDWIDTH           250.0
+#define SPREADING_FACTOR    9
+#define TRANSMIT_POWER      0
+
+String input;
+uint64_t tx_time;
+
+void setup() {
+  heltec_setup();
+
+  both.println("LoRa Init...");
+  RADIOLIB_OR_HALT(radio.begin());
+
+  // Set LoRa radio parameters
+  RADIOLIB_OR_HALT(radio.setFrequency(FREQUENCY));
+  RADIOLIB_OR_HALT(radio.setBandwidth(BANDWIDTH));
+  RADIOLIB_OR_HALT(radio.setSpreadingFactor(SPREADING_FACTOR));
+  RADIOLIB_OR_HALT(radio.setOutputPower(TRANSMIT_POWER));
+
+  both.println("Type 'fire' in Serial to transmit.");
+}
+
+void loop() {
+  heltec_loop();
+
+  // Check for user input in Serial Monitor
+  while (Serial.available()) {
+    char c = Serial.read();
+
+    // Handle carriage return or newline
+    if (c == '\n' || c == '\r') {
+      input.trim();
+      if (input.equalsIgnoreCase("fire")) {
+        heltec_led(50);
+        tx_time = millis();
+        RADIOLIB(radio.transmit("fire"));
+        tx_time = millis() - tx_time;
+        heltec_led(0);
+
+        if (_radiolib_status == RADIOLIB_ERR_NONE) {
+          both.printf("TX [fire] OK (%llu ms)\n", tx_time);
+        } else {
+          both.printf("TX failed (%d)\n", _radiolib_status);
+        }
+      } else if (input.length() > 0) {
+        both.printf("Ignored input: '%s'\n", input.c_str());
+      }
+      input = "";
+    } else {
+      input += c;
+    }
+  }
+}
