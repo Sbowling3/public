@@ -1,0 +1,266 @@
+// V7 Transmitter
+
+#define RADIOLIB_DEBUG_DISABLED
+#define HELTEC_POWER_BUTTON
+#include <heltec_unofficial.h>
+#include <U8g2lib.h>
+#include <Wire.h>
+#include <BLEDevice.h>
+#include <BLEServer.h>
+#include <BLEUtils.h>
+#include <BLE2902.h>
+
+// OLED pins
+#define SDA_OLED 17
+#define SCL_OLED 18
+#define RST_OLED 21
+#define VEXT 36
+
+// LoRa settings
+#define FREQUENCY           905.2
+#define BANDWIDTH           125.0
+#define SPREADING_FACTOR    9
+#define TRANSMIT_POWER      21
+#define CODING_RATE         7
+#define SYNC_WORD           0x12
+
+#define BUTTON_PIN          48
+#define DEBOUNCE_DELAY      50
+
+// BLE UUIDs
+#define SERVICE_UUID        "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
+#define CHAR_TX_UUID        "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
+#define CHAR_RX_UUID        "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
+
+U8G2_SSD1306_128X64_NONAME_F_SW_I2C u8g2_display(
+    U8G2_R1, SCL_OLED, SDA_OLED, RST_OLED
+);
+
+BLEServer* pServer = nullptr;
+BLECharacteristic* pTxChar = nullptr;
+bool deviceConnected = false;
+String bleInput = "";
+
+String input;
+uint64_t tx_time;
+int lastButtonState = HIGH;
+unsigned long lastDebounceTime = 0;
+
+void processInput(String data, const char* source);
+
+void blePrint(String msg) {
+  Serial.println(msg);
+  if (deviceConnected && pTxChar) {
+    pTxChar->setValue(msg.c_str());
+    pTxChar->notify();
+  }
+}
+
+class ServerCallbacks : public BLEServerCallbacks {
+  void onConnect(BLEServer* pServer) {
+    deviceConnected = true;
+    blePrint("BLE Connected");
+  }
+  void onDisconnect(BLEServer* pServer) {
+    deviceConnected = false;
+    pServer->startAdvertising();
+    Serial.println("BLE Disconnected, restarting advertising...");
+  }
+};
+
+class RxCallbacks : public BLECharacteristicCallbacks {
+  void onWrite(BLECharacteristic* pChar) {
+    String val = pChar->getValue().c_str();
+    val.trim();
+    if (val.length() > 0) bleInput = val;
+  }
+};
+
+void setup() {
+  heltec_setup();
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  Serial.begin(115200);
+
+  // OLED
+  pinMode(VEXT, OUTPUT);
+  digitalWrite(VEXT, LOW);
+  delay(100);
+  u8g2_display.begin();
+  u8g2_display.setFont(u8g2_font_ncenB08_tr);
+  u8g2_display.setFontPosTop();
+  u8g2_display.clearBuffer();
+  u8g2_display.drawStr(0, 0, "Initializing...");
+  u8g2_display.sendBuffer();
+
+  // BLE
+  BLEDevice::init("LoRa-TX");
+  pServer = BLEDevice::createServer();
+  pServer->setCallbacks(new ServerCallbacks());
+  BLEService* pService = pServer->createService(SERVICE_UUID);
+
+  pTxChar = pService->createCharacteristic(
+    CHAR_TX_UUID,
+    BLECharacteristic::PROPERTY_NOTIFY
+  );
+  pTxChar->addDescriptor(new BLE2902());
+
+  BLECharacteristic* pRxChar = pService->createCharacteristic(
+    CHAR_RX_UUID,
+    BLECharacteristic::PROPERTY_WRITE
+  );
+  pRxChar->setCallbacks(new RxCallbacks());
+
+  pService->start();
+  pServer->startAdvertising();
+  Serial.println("BLE advertising as 'LoRa-TX'");
+
+  // LoRa
+  RADIOLIB_OR_HALT(radio.begin());
+  RADIOLIB_OR_HALT(radio.setFrequency(FREQUENCY));
+  RADIOLIB_OR_HALT(radio.setBandwidth(BANDWIDTH));
+  RADIOLIB_OR_HALT(radio.setSpreadingFactor(SPREADING_FACTOR));
+  RADIOLIB_OR_HALT(radio.setOutputPower(TRANSMIT_POWER));
+  RADIOLIB_OR_HALT(radio.setCodingRate(CODING_RATE));
+  RADIOLIB_OR_HALT(radio.setSyncWord(SYNC_WORD));
+  RADIOLIB_OR_HALT(radio.startReceive());
+
+  blePrint("Device [ARMED]");
+  u8g2_display.clearBuffer();
+  u8g2_display.drawStr(0, 0, "[ARMED]");
+  u8g2_display.sendBuffer();
+}
+
+void loop() {
+  heltec_loop();
+
+  // USB Serial input
+  while (Serial.available()) {
+    char c = Serial.read();
+    if (c == '\n' || c == '\r') {
+      input.trim();
+      if (input.length() > 0) processInput(input, "Serial");
+      input = "";
+    } else {
+      input += c;
+    }
+  }
+
+  // BLE input
+  if (bleInput.length() > 0) {
+    processInput(bleInput, "BLE");
+    bleInput = "";
+  }
+
+  // Button
+  int buttonState = digitalRead(BUTTON_PIN);
+  if (buttonState != lastButtonState) lastDebounceTime = millis();
+  if ((millis() - lastDebounceTime) > DEBOUNCE_DELAY) {
+    if (buttonState == LOW) processInput("fire", "Button");
+  }
+  lastButtonState = buttonState;
+
+  // Listen for any incoming packets in main loop (non-test responses)
+  if (radio.available()) {
+    String response;
+    int state = radio.readData(response);
+    if (state == RADIOLIB_ERR_NONE) {
+      blePrint("RX: " + response);
+      u8g2_display.clearBuffer();
+      u8g2_display.drawStr(0, 0, "RX Response:");
+      u8g2_display.drawStr(0, 10, response.c_str());
+      u8g2_display.sendBuffer();
+    }
+    radio.startReceive();
+  }
+}
+
+void processInput(String data, const char* source) {
+  u8g2_display.clearBuffer();
+  u8g2_display.drawStr(0, 0, "Sending:");
+  u8g2_display.drawStr(0, 10, data.c_str());
+  u8g2_display.sendBuffer();
+
+  if (data.equalsIgnoreCase("fire")) {
+    heltec_led(50);
+    tx_time = millis();
+
+    // Triple transmit for fire reliability
+    for (int i = 0; i < 3; i++) {
+      RADIOLIB(radio.transmit("fire"));
+      delay(200);
+    }
+
+    tx_time = millis() - tx_time;
+    heltec_led(0);
+    radio.startReceive();
+
+    u8g2_display.clearBuffer();
+    if (_radiolib_status == RADIOLIB_ERR_NONE) {
+      blePrint("TX[fire] SENT");
+      u8g2_display.drawStr(0, 0, "TX Sent: fire");
+    } else {
+      blePrint("TX failed: " + String(_radiolib_status));
+      u8g2_display.drawStr(0, 0, "TX Failed");
+    }
+    u8g2_display.sendBuffer();
+
+  } else if (data.equalsIgnoreCase("test")) {
+    heltec_led(50);
+    tx_time = millis();
+
+    // Single transmit for test so we can get into RX fast
+    RADIOLIB(radio.transmit("test"));
+
+    tx_time = millis() - tx_time;
+    heltec_led(0);
+
+    // Get into receive mode immediately
+    radio.startReceive();
+
+    if (_radiolib_status == RADIOLIB_ERR_NONE) {
+      blePrint("TX[test] SENT - waiting for response...");
+      u8g2_display.clearBuffer();
+      u8g2_display.drawStr(0, 0, "Test sent");
+      u8g2_display.drawStr(0, 10, "Waiting...");
+      u8g2_display.sendBuffer();
+
+      // Wait up to 5 seconds for "Good" response
+      unsigned long waitStart = millis();
+      bool gotResponse = false;
+      while (millis() - waitStart < 5000) {
+        if (radio.available()) {
+          String response;
+          int rxState = radio.readData(response);
+          if (rxState == RADIOLIB_ERR_NONE) {
+            blePrint("Response: " + response);
+            u8g2_display.clearBuffer();
+            u8g2_display.drawStr(0, 0, "Response:");
+            u8g2_display.drawStr(0, 10, response.c_str());
+            u8g2_display.sendBuffer();
+            delay(100);
+            gotResponse = true;
+          }
+          break;
+        }
+        delay(10);
+      }
+
+      if (!gotResponse) {
+        blePrint("No response received");
+        u8g2_display.clearBuffer();
+        u8g2_display.drawStr(0, 0, "No response");
+        u8g2_display.sendBuffer();
+      }
+
+      radio.startReceive(); // Back to listening
+    } else {
+      blePrint("TX[test] failed: " + String(_radiolib_status));
+      u8g2_display.clearBuffer();
+      u8g2_display.drawStr(0, 0, "TX Failed");
+      u8g2_display.sendBuffer();
+    }
+
+  } else {
+    blePrint("Ignored: " + data);
+  }
+}
