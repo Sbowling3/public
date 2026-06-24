@@ -1,0 +1,83 @@
+// V7 Receiver
+
+#define RADIOLIB_DEBUG_DISABLED
+#define HELTEC_POWER_BUTTON
+#include <heltec_unofficial.h>
+
+#define FREQUENCY           905.2
+#define BANDWIDTH           125.0
+#define SPREADING_FACTOR    9
+#define TRANSMIT_POWER      21
+#define CODING_RATE         7
+#define SYNC_WORD           0x12
+#define LIGHT_PIN           48
+
+String received;
+uint64_t rx_time;
+
+void setup() {
+  heltec_setup();
+
+  pinMode(LIGHT_PIN, OUTPUT);
+  digitalWrite(LIGHT_PIN, LOW);
+
+  both.println("LoRa Init...");
+  RADIOLIB_OR_HALT(radio.begin());
+  RADIOLIB_OR_HALT(radio.setFrequency(FREQUENCY));
+  RADIOLIB_OR_HALT(radio.setBandwidth(BANDWIDTH));
+  RADIOLIB_OR_HALT(radio.setSpreadingFactor(SPREADING_FACTOR));
+  RADIOLIB_OR_HALT(radio.setOutputPower(TRANSMIT_POWER));
+  RADIOLIB_OR_HALT(radio.setCodingRate(CODING_RATE));
+  RADIOLIB_OR_HALT(radio.setSyncWord(SYNC_WORD));
+
+  delay(500);
+  RADIOLIB_OR_HALT(radio.startReceive());
+  both.println("LoRa Receiver Ready");
+
+  // Visual ready indicator
+  heltec_led(50); delay(200); heltec_led(0);
+  delay(200);
+  heltec_led(50); delay(200); heltec_led(0);
+}
+
+void loop() {
+  heltec_loop();
+
+  int state = radio.receive(received);
+
+  if (state == RADIOLIB_ERR_NONE) {
+    heltec_led(50);
+    rx_time = millis();
+    both.printf("RX [%s] OK (%llu ms)\n", received.c_str(), rx_time);
+
+    if (received.equals("fire")) {
+      both.println("Triggering light...");
+      digitalWrite(LIGHT_PIN, HIGH);
+      delay(500);
+      digitalWrite(LIGHT_PIN, LOW);
+      both.println("Light blinked!");
+
+    } else if (received.equals("test")) {
+      both.println("Test received - sending Good...");
+
+     delay(300); // Let transmitter get into RX mode
+      RADIOLIB(radio.transmit("Good"));
+      delay(300);
+      RADIOLIB(radio.transmit("Good"));
+
+      if (_radiolib_status == RADIOLIB_ERR_NONE) {
+        both.println("Good sent!");
+      } else {
+        both.printf("Good TX failed (%d)\n", _radiolib_status);
+      }
+
+      RADIOLIB_OR_HALT(radio.startReceive());
+    }
+
+    heltec_led(0);
+    received.clear();
+
+  } else if (state != RADIOLIB_ERR_RX_TIMEOUT) {
+    both.printf("RX failed (%d)\n", state);
+  }
+}
