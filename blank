@@ -1,59 +1,1217 @@
-Heres the working code for the sender. Can you make the receiver code in similar format? 
-#define RADIOLIB_DEBUG_DISABLED  // Disable noisy debug output
-#define HELTEC_POWER_BUTTON
-#include <heltec_unofficial.h>
+=====================================
+           FILE LIST
+=====================================
 
-#define FREQUENCY           905.2
-#define BANDWIDTH           250.0
-#define SPREADING_FACTOR    9
-#define TRANSMIT_POWER      0
+Directory: C:\Users\N07773\Desktop\New folder\.
+   autorun.inf
+   bootmgr
+   bootmgr.efi
+   setup.exe
 
-String input;
-uint64_t tx_time;
+Directory: C:\Users\N07773\Desktop\New folder\boot\.
+   bcd
+   boot.sdi
+   bootfix.bin
+   bootsect.exe
+   etfsboot.com
+   memtest.exe
 
-void setup() {
-  heltec_setup();
+Directory: C:\Users\N07773\Desktop\New folder\boot\en-us\.
+   bootsect.exe.mui
 
-  both.println("LoRa Init...");
-  RADIOLIB_OR_HALT(radio.begin());
+Directory: C:\Users\N07773\Desktop\New folder\boot\fonts\.
+   chs_boot.ttf
+   cht_boot.ttf
+   jpn_boot.ttf
+   kor_boot.ttf
+   malgunn_boot.ttf
+   malgun_boot.ttf
+   malgun_console.ttf
+   meiryon_boot.ttf
+   meiryo_boot.ttf
+   meiryo_console.ttf
+   msjhn_boot.ttf
+   msjh_boot.ttf
+   msjh_console.ttf
+   msyhn_boot.ttf
+   msyh_boot.ttf
+   msyh_console.ttf
+   segmono_boot.ttf
+   segoen_slboot.ttf
+   segoe_slboot.ttf
+   wgl4_boot.ttf
 
-  // Set LoRa radio parameters
-  RADIOLIB_OR_HALT(radio.setFrequency(FREQUENCY));
-  RADIOLIB_OR_HALT(radio.setBandwidth(BANDWIDTH));
-  RADIOLIB_OR_HALT(radio.setSpreadingFactor(SPREADING_FACTOR));
-  RADIOLIB_OR_HALT(radio.setOutputPower(TRANSMIT_POWER));
+Directory: C:\Users\N07773\Desktop\New folder\boot\resources\.
+   bootres.dll
+   bootres_hci.dll
 
-  both.println("Type 'fire' in Serial to transmit.");
-}
+Directory: C:\Users\N07773\Desktop\New folder\efi\.
 
-void loop() {
-  heltec_loop();
+Directory: C:\Users\N07773\Desktop\New folder\efi\boot\.
+   bootx64.efi
 
-  // Check for user input in Serial Monitor
-  while (Serial.available()) {
-    char c = Serial.read();
+Directory: C:\Users\N07773\Desktop\New folder\efi\microsoft\.
 
-    // Handle carriage return or newline
-    if (c == '\n' || c == '\r') {
-      input.trim();
-      if (input.equalsIgnoreCase("fire")) {
-        heltec_led(50);
-        tx_time = millis();
-        RADIOLIB(radio.transmit("fire"));
-        tx_time = millis() - tx_time;
-        heltec_led(0);
+Directory: C:\Users\N07773\Desktop\New folder\efi\microsoft\boot\.
+   bcd
+   boot.stl
+   cdboot.efi
+   cdboot_noprompt.efi
+   efisys.bin
+   efisys_noprompt.bin
+   memtest.efi
+   winsipolicy.p7b
 
-        if (_radiolib_status == RADIOLIB_ERR_NONE) {
-          both.printf("TX [fire] OK (%llu ms)\n", tx_time);
-        } else {
-          both.printf("TX failed (%d)\n", _radiolib_status);
-        }
-      } else if (input.length() > 0) {
-        both.printf("Ignored input: '%s'\n", input.c_str());
-      }
-      input = "";
-    } else {
-      input += c;
-    }
-  }
-}
+Directory: C:\Users\N07773\Desktop\New folder\efi\microsoft\boot\cipolicies\.
+
+Directory: C:\Users\N07773\Desktop\New folder\efi\microsoft\boot\cipolicies\active\.
+   {5dac656c-21ad-4a02-ab49-649917162e70}.cip
+   {82443e1e-8a39-4b4a-96a8-f40ddc00b9f3}.cip
+   {cdd5cb55-db68-4d71-aa38-3df2b6473a52}.cip
+
+Directory: C:\Users\N07773\Desktop\New folder\efi\microsoft\boot\fonts\.
+   chs_boot.ttf
+   cht_boot.ttf
+   jpn_boot.ttf
+   kor_boot.ttf
+   malgunn_boot.ttf
+   malgun_boot.ttf
+   malgun_console.ttf
+   meiryon_boot.ttf
+   meiryo_boot.ttf
+   meiryo_console.ttf
+   msjhn_boot.ttf
+   msjh_boot.ttf
+   msjh_console.ttf
+   msyhn_boot.ttf
+   msyh_boot.ttf
+   msyh_console.ttf
+   segmono_boot.ttf
+   segoen_slboot.ttf
+   segoe_slboot.ttf
+   wgl4_boot.ttf
+
+Directory: C:\Users\N07773\Desktop\New folder\efi\microsoft\boot\resources\.
+   bootres.dll
+   bootres_hci.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\.
+   acmigration.dll
+   acres.dll
+   actionqueue.dll
+   adfscomp.dll
+   admtv3check.dll
+   aeinv.dll
+   alert.gif
+   appcompat.xsl
+   appcompatservicing.dll
+   appcompat_bidi.xsl
+   appcompat_detailed.xsl
+   appcompat_detailed_bidi.xsl
+   appcompat_detailed_bidi_txt.xsl
+   appcompat_detailed_txt.xsl
+   appextagent.dll
+   appraiser.dll
+   appraiser.sdb
+   appraiserdatasha1.cat
+   appraiserres.dll
+   appraisersdblatestoshash.txt
+   arunimg.dll
+   arunres.dll
+   autorun.dll
+   background_cli.bmp
+   bcd.dll
+   boot.wim
+   bootsvc.dll
+   cdplib.mof
+   cdplibuninstall.mof
+   clustercompliance.dll
+   cmi2migxml.dll
+   cmisetup.dll
+   compatappraiserresources.dll
+   compatctrl.dll
+   compatplugin.dll
+   compatresources.dll
+   compliance.ini
+   compres.dll
+   cryptosetup.dll
+   csiagent.dll
+   cversion.ini
+   db_msftproductionwindowssigningca.cer
+   deployprovider.dll
+   devinv.dll
+   diager.dll
+   diagnostic.dll
+   diagtrack.dll
+   diagtrackrunner.exe
+   dism.exe
+   dismapi.dll
+   dismcore.dll
+   dismcoreps.dll
+   dismprov.dll
+   du.dll
+   facilitator.dll
+   folderprovider.dll
+   hwcompat.dll
+   hwcompat.txt
+   hwcompatPE.txt
+   hwexclude.txt
+   hwexcludePE.txt
+   hwreqchk.dll
+   hypervcomplcheck.dll
+   iasmigplugin.dll
+   icbexclusion.inf
+   idwbinfo.txt
+   iiscomp.dll
+   imagelib.dll
+   imagingprovider.dll
+   input.dll
+   install.wim
+   itgtupg.dll
+   lang.ini
+   locale.nls
+   logprovider.dll
+   mediasetupuimgr.dll
+   microsoft.media.playready.appraiser.dll
+   migapp.dll
+   migapp.xml
+   migcore.dll
+   mighost.exe
+   migisol.dll
+   migres.dll
+   migstore.dll
+   migsys.dll
+   migtestplugin.dll
+   mitigation.dll
+   mxeagent.dll
+   nlsbres.dll
+   ntdsupg.dll
+   ntfrsupg.dll
+   nxquery.inf
+   nxquery.sys
+   offline.xml
+   offlineprofileutils.dll
+   oscomps.xml
+   osfilter.inf
+   osimageprovider.dll
+   outofbox_windows_db.bin
+   pnpibs.dll
+   pnppropmig.dll
+   rdsupgcheck.dll
+   reagent.admx
+   reagent.dll
+   reagent.xml
+   reportgen.dll
+   reservemanager.dll
+   rmsupg.dll
+   rollback.exe
+   schema.dat
+   sdbapiu.dll
+   segoeui.ttf
+   servicingcommon.dll
+   setup.exe
+   setupcompat.dll
+   setupcore.dll
+   setupdiag.exe
+   setuperror.exe
+   setuphost.exe
+   setupmgr.dll
+   setupplatform.cfg
+   setupplatform.dll
+   setupplatform.exe
+   setupprep.exe
+   sfcn.dat
+   sflcid.dat
+   sflistrs1.dat
+   sflistw7.dat
+   sflistw8.dat
+   sflistwb.dat
+   sflistwt.dat
+   sfpat.inf
+   sfpatrs1.inf
+   sfpatw7.inf
+   sfpatw8.inf
+   sfpatwb.inf
+   sfpatwt.inf
+   smiengine.dll
+   spflvrnt.dll
+   spprgrss.dll
+   spwizeng.dll
+   spwizimg.dll
+   spwizres.dll
+   sqmapi.dll
+   uddicomp.dll
+   unattend.dll
+   unattendmgr.dll
+   unbcl.dll
+   uninstall.xml
+   uninstall_data.xml
+   updateagent.dll
+   updatecompression.dll
+   upgloader.dll
+   upgradeagent.dll
+   upgradeagent.xml
+   upgrade_bulk.xml
+   upgrade_comp.xml
+   upgrade_data.xml
+   upgrade_frmwrk.xml
+   upgwow_bulk.xml
+   utcapi.dll
+   uxlib.dll
+   uxlibres.dll
+   vhdprovider.dll
+   w32uiimg.dll
+   w32uires.dll
+   warning.gif
+   wdsclient.dll
+   wdsclientapi.dll
+   wdscommonlib.dll
+   wdscore.dll
+   wdscsl.dll
+   wdsimage.dll
+   wdstptc.dll
+   wdsupgcompl.dll
+   wdsutil.dll
+   wimgapi.dll
+   wimprovider.dll
+   win32ui.dll
+   windlp.dll
+   winsetup.dll
+   winsetupboot.hiv
+   winsetupboot.sys
+   winsetupmon.hiv
+   winsetupmon.sys
+   wpx.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\asz\.
+   arunimg.dll
+   arunres.dll
+   background_asz.bmp
+   setupmedia.cfg
+   spwizimg.dll
+   spwizres.dll
+   w32uires.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\asz\en-us\.
+   arunres.dll.mui
+   spwizres.dll.mui
+   w32uires.dll.mui
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\ca-es\.
+   MediaSetupUIMgr.dll.mui
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\dlmanifests\.
+   accessibilitycpl-dl.man
+   activedirectory-webservices-dl.man
+   activedirectory-wmireplicationprovider-dl.man
+   adsi-ldap-extensions-dl.man
+   adsi-ldap-provider-dl.man
+   adsi-router-dl.man
+   adsi-winnt-provider-dl.man
+   browserservice-dl.man
+   capi2_certs-dl.man
+   commandprompt-dl.man
+   coreos-dl.man
+   credential-manager-dl.man
+   cryptoconfig-dl.man
+   crypto_keys-dl.man
+   dfsclient-dl.man
+   dfsmgmt-dl.man
+   dhcpclient-dl.man
+   directoryservices-adam-dl.man
+   directoryservices-domain-dl.man
+   directoryservices-ism-smtp-dl.man
+   dns-client-dl.man
+   dns-server-service-dl.man
+   dpapi_keys-dl.man
+   etw-core-dl.man
+   etwtracing.man
+   eventlog-dl.man
+   explorer-dl.man
+   feclient-dl.man
+   fonts-type1-dl.man
+   frs-core-dl.man
+   gpbase-dl.man
+   gpmc-dl.man
+   gpmgmt-dl.man
+   grouppolicy-admin-gpedit-dl.man
+   grouppolicy-admin-gpedit-snapin-dl.man
+   grouppolicy-cse-softwareinstallation-dl.man
+   grouppolicy-serveradmintools-gpmc-dl.man
+   ieframe-dl.man
+   ime-traditional-chinese-migration-dl.man
+   kerberos-key-distribution-center-dl.man
+   ldap-client-dl.man
+   microsoft-windows-bits-client-dl.man
+   microsoft-windows-certificateservices-ca-dl.man
+   microsoft-windows-certificateservices-camanagement-dl.man
+   microsoft-windows-certificateservices-mscep-dl.man
+   microsoft-windows-errorreportingcore-dl.man
+   microsoft-windows-errorreportingfaults-dl.man
+   microsoft-windows-fax-client-applications-dl.man
+   microsoft-windows-fax-client-proenterprise-dl.man
+   microsoft-windows-fax-common-dl.man
+   microsoft-windows-fax-server-dl.man
+   microsoft-windows-fax-service-dl.man
+   microsoft-windows-htmlhelp-dl.man
+   microsoft-windows-ie-esc-dl.man
+   microsoft-windows-ie-feeds-platform-dl.man
+   microsoft-windows-ie-internetexplorer-dl.man
+   microsoft-windows-iis-corewebengine-deployment-dl.man
+   microsoft-windows-netfx35-dl.man
+   microsoft-windows-netfx35cdfcomp-dl.man
+   microsoft-windows-netfxcorecomp-dl.man
+   microsoft-windows-storagemigration-dl.man
+   microsoft-windows-tapisetup-dl.man
+   microsoft-windows-terminalservices-clientactivexcore-dl.man
+   microsoft-windows-wab-dl.man
+   microsoft-windows-wcfcorecomp-dl.man
+   microsoft.windows.com.base-dl.man
+   microsoft.windows.com.complus.setup.dl.man
+   msmq-dcom-dl.man
+   msmq-domain-ic-dl.man
+   msmq-http-dl.man
+   msmq-messagingcoreservice-dl.man
+   msmq-multicast-dl.man
+   msmq-routing-dl.man
+   msmq-triggers-dl.man
+   mup-dl.man
+   netfx-wcf-http-activation-dl.man
+   netfx-wcf-msmqactivation-registration-dl.man
+   netfx-wcf-pipeactivation-registration-dl.man
+   netfx-wcf-tcpactivation-registration-dl.man
+   netfx-wcf-tcpportsharing-dl.man
+   netfx3-dl.man
+   netfx4-wcf-client-dl.man
+   netfx4-wcf-extended-dl.man
+   netfx4clientcorecomp-dl.man
+   netlogon-dl.man
+   ntfs-dl.man
+   ntoskrnl-dl.man
+   odbc32dll-dl.man
+   partmgr-dl.man
+   printing-spooler-core-dl.man
+   printing-spooler-networkclient-dl.man
+   rights-management-client-v1-api-dl.man
+   rights-management-services-server-dl.man
+   rpc-http-dl.man
+   rpc-http_proxy-dl.man
+   rpc-local-dl.man
+   rpc-remote-dl.man
+   schannel-dl.man
+   schedsvc-dl.man
+   security-digest-dl.man
+   security-kerberos-dl.man
+   security-ntlm-dl.man
+   security-ntlm-lmc.man
+   shutdown-event-tracker-dl.man
+   smartcardsubsystem-dl.man
+   smbserver-dl.man
+   smss-dl.man
+   smtpsvc-admin-dl.man
+   smtpsvc-service-dl.man
+   speechcommon-dl.man
+   tabletpc-tabbtn-dl.man
+   tabletpcinputpanel-dl.man
+   tabletpcjournal-dl.man
+   tabletpcplatforminput-core-dl.man
+   terminalservices-appserver-dl.man
+   terminalservices-appserver-licensing-dl.man
+   terminalservices-drivers-dl.man
+   terminalservices-licenseserver-dl.man
+   terminalservices-localsessionmanager-dl.man
+   terminalservices-rdp-winstationextensions-dl.man
+   terminalservices-remoteconnectionmanager-dl.man
+   terminalservices-sessiondirectory-client-dl.man
+   terminalservices-sessiondirectory-server-dl.man
+   terminalservices-terminalservicesclient-dl.man
+   textservicesframework-migration-dl.man
+   video-tvvideocontrol-dl.man
+   volsnap-dl.man
+   wcf-http-activation-dl.man
+   wcf-http-activation-postapply-dl.man
+   wcf-nonhttp-activation-dl.man
+   web-services-for-management-core-dl.man
+   webenroll-dl.man
+   win32k-settings-dl.man
+   windowssearchengine-dl.man
+   winlogon-dl.man
+   wmi-core-dl.man
+   workstationservice-dl.man
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\dlmanifests\microsoft-activedirectory-webservices-dl\.
+   adwsmigrate.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\dlmanifests\microsoft-windows-com-complus-setup-dl\.
+   commig.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\dlmanifests\microsoft-windows-com-dtc-setup-dl\.
+   msdtcstp.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\dlmanifests\microsoft-windows-dhcpservermigplugin-dl\.
+   dhcpsrvmigplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\dlmanifests\microsoft-windows-directoryservices-adam-dl\.
+   adammigrate.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\dlmanifests\microsoft-windows-iasserver-migplugin\.
+   iasmigplugin.dll
+   iasmigreader.exe
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\dlmanifests\microsoft-windows-ie-clientnetworkprotocolimplementation-migration\.
+   wininetplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\dlmanifests\microsoft-windows-internet-naming-service-runtime\.
+   winsplgn.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\dlmanifests\microsoft-windows-msmq-messagingcoreservice\.
+   mqmigplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\dlmanifests\microsoft-windows-networkbridge\.
+   bridgemigplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\dlmanifests\microsoft-windows-networkloadbalancing-core\.
+   nlbmigplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\dlmanifests\microsoft-windows-rasconnectionmanager\.
+   cmmigr.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\dlmanifests\microsoft-windows-rasserver-migplugin\.
+   rasmigplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\dlmanifests\microsoft-windows-tapisetup\.
+   tapimigplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\dlmanifests\microsoft-windows-terminalservices-licenseserver\.
+   tlsmigplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\dlmanifests\microsoft-windows-textservicesframework-migration-dl\.
+   chxmig.dll
+   imjpmig.dll
+   imkrmig.dll
+   msctfmig.dll
+   tabletextservicemig.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\dlmanifests\microsoft-windows-unimodem-config\.
+   modemmigplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\dlmanifests\microsoft-windows-winsock-core-infrastructure-upgrade\.
+   wsupgrade.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\dlmanifests\microsoft-windows-wmi-core\.
+   wmimigrationplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\dlmanifests\networking-mpssvc-svc\.
+   icfupgd.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\en-us\.
+   acres.dll.mui
+   actionqueue.dll.mui
+   appraiser.dll.mui
+   arunres.dll.mui
+   cmisetup.dll.mui
+   compatappraiserresources.dll.mui
+   compatctrl.dll.mui
+   compatresources.dll.mui
+   compres.dll.mui
+   credits.htm
+   credits.txt
+   deployprovider.dll.mui
+   dism.exe.mui
+   dismapi.dll.mui
+   dismcore.dll.mui
+   dismprov.dll.mui
+   erofflps.txt
+   folderprovider.dll.mui
+   imagingprovider.dll.mui
+   input.dll.mui
+   logprovider.dll.mui
+   mediasetupuimgr.dll.mui
+   migres.dll.mui
+   nlsbres.dll.mui
+   oobe_help_opt_in_details.rtf
+   osimageprovider.dll.mui
+   pnpibs.dll.mui
+   privacy.rtf
+   reagent.adml
+   reagent.dll.mui
+   rollback.exe.mui
+   setup.exe.mui
+   setupcompat.dll.mui
+   setupcore.dll.mui
+   setuperror.exe.mui
+   setupmgr.dll.mui
+   setupplatform.exe.mui
+   setupprep.exe.mui
+   smiengine.dll.mui
+   spwizres.dll.mui
+   upgloader.dll.mui
+   uxlibres.dll.mui
+   vhdprovider.dll.mui
+   vofflps.rtf
+   w32uires.dll.mui
+   wdsclient.dll.mui
+   wdsimage.dll.mui
+   wimgapi.dll.mui
+   wimprovider.dll.mui
+   windlp.dll.mui
+   winsetup.dll.mui
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\etwproviders\.
+   actionqueueetw.dll
+   auditetw.dll
+   cmisetupetw.dll
+   etwproviderinstall.vbs
+   oobeldretw.dll
+   setupcletw.dll
+   setupetw.dll
+   setupugcetw.dll
+   sysprepetw.dll
+   windeployetw.dll
+   winsetupetw.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\etwproviders\en-us\.
+   actionqueueetw.dll.mui
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\eu-es\.
+   MediaSetupUIMgr.dll.mui
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\gl-es\.
+   MediaSetupUIMgr.dll.mui
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\id-id\.
+   MediaSetupUIMgr.dll.mui
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\inf\.
+   setup.cfg
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\migration\.
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\migration\wtr\.
+   adminpack_en-us.inf
+   adminpack_en-us_noloc.inf
+   appmanwtr.inf
+   browserchoice_win7.inf
+   browserchoice_win8.inf
+   compattelemetry.inf
+   ftp_7.0.inf
+   ftp_7.5_en-us_noloc.inf
+   ftp_7.5_loc.inf
+   gwxmig.inf
+   powershell_en-us_noloc.inf
+   powershell_loc.inf
+   unpmig.inf
+   webdav_7.0.inf
+   webdav_7.5_en-us_noloc.inf
+   webdav_7.5_loc.inf
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\.
+   activedirectory-webservices-replacement.man
+   adsi-router-replacement.man
+   application-experience-program-compatibility-assistant-replacement.man
+   appmanmigration-replacement.man
+   appxalluserstore-replacement.man
+   appxdeploymentserver-replacement.man
+   audio-audiocore-client-replacement.man
+   audiommecore-mm-other-migration-replacement.man
+   authui-migration-replacement.man
+   authui-migration-win8-replacement.man
+   azshci-service-migration-replacement.man
+   bisrv-replacement.man
+   capi2_certs-repl.man
+   certificateenrollment-replacement.man
+   cliplicensemigration-replacement.man
+   cloudapreplacement.man
+   cloudexperiencehostonecore-replacement.man
+   codeintegrity-repl.man
+   commandprompt-win7-replacement.man
+   commandprompt-win8-replacement.man
+   contentdeliverymanager.utilities-replacement.man
+   coremmres-replacement.man
+   coreos-repl.man
+   credential-manager-replacement.man
+   crypto_keys-repl.man
+   dataintegrityscan-replacement.man
+   dcb-repl.man
+   desktopux-replacement.man
+   deviceassociationframework-replacement.man
+   devicedirectory-devicedirectoryclient-desktop-replacement.man
+   deviceregistration-replacement.man
+   dhcpclientdll-repl.man
+   dhcpserver-tools-replacement.man
+   dhcpservermigplugin-rep.man
+   dhcpservermigpluginwin8-replacement.man
+   directaccessservermanagement-repl.man
+   directoryservices-adam-client-replacement.man
+   directoryservices-adam-tools-replacement.man
+   directoryservices-administrativecenter-replacement.man
+   directoryservices-domaincontroller-servercoreupg-replacement.man
+   directoryservices-domaincontroller-tools-replacement.man
+   directoryservices-sm-plugin.registration-replacement.man
+   displayconfigsettings_win7update.man
+   dmrcwin7replacement.man
+   dns-client-mw-replacement.man
+   dns-client-replacement.man
+   dns-server-role-replacement.man
+   dns-server-tools-replacement.man
+   dpapi_keys-repl.man
+   dsreg-replacement.man
+   edgemigrationplugin.man
+   edpnotify-replacement.man
+   elam-replacement.man
+   etw-core-replacement.man
+   eudcedit-replacement.man
+   explorer-repl.man
+   extensibleauthenticationprotocolhostservice-rep.man
+   FailoverCluster-ClusSvc-Replacement.man
+   failovercluster-core-wow64-rm.man
+   failovercluster-updating-powershellcore-replacement.man
+   feclient-replacement-th.man
+   fidocredprov_dll_repl.man
+   fileserver-replacement.man
+   font-truetype-fontsregistrysettingsmigration-replacement.man
+   fonts-type1-replacement.man
+   fsdepends-replacement.man
+   fundisc-replacement.man
+   fveapi-replacement.man
+   gatewayservice-replacement.man
+   gpbase-replacement.man
+   gpiobuttons-replacement.man
+   hal-repl.man
+   helpandsupport-replacement.man
+   http-replacement.man
+   hwvid-migration-replacement-2.man
+   hyperv-compute-host-service-replacement.man
+   iasruntime-repl.man
+   identityserver-migration-replacement.man
+   identityserver-proxymigration-replacement.man
+   identitystore-replacement.man
+   iis-adminservice-rm.man
+   iis-appwarmup-rm.man
+   iis-ftpsvc-rm.man
+   iis-managementconsole-rm.man
+   iis-sharedlibraries-rm.man
+   iis-w3logsvc-rm.man
+   iis-w3svc-rm.man
+   ime-eashared-migration-replacement.man
+   international-core-replacement.man
+   international-timezones-replacement.man
+   internet-naming-service-runtime-rep.man
+   internet-naming-tools-replacement.man
+   ioschedfilter-replacement.man
+   ipv4ipv6coexistencemigration-net-replacement.man
+   kernel-pnp-repl.man
+   kernel-server-replacement.man
+   kernel32-replacement.man
+   kernel32-server-replacement.man
+   keyboardfilter-replacement.man
+   ldap-client-replacement.man
+   legacy-sapi-repl.man
+   mdm_migration-replacement.man
+   media-settings-migration-replacement.man
+   memextdriver-replacement.man
+   mfmpeg2srcsnk-migration-replacement.man
+   mfplat-migration-replacement.man
+   mfsrcsnk-migration-replacement.man
+   microsoft-activedirectory-powershell-replacement.man
+   microsoft-certificateauthority-enrollment-serverupgrade-replacement.man
+   microsoft-certificateservices-ca-serverupgrade-replacement.man
+   microsoft-certificateservices-mscep-serverupgrade-replacement.man
+   microsoft-certificateservices-ocsp-serverupgrade-replacement.man
+   microsoft-certificateservices-policy-serverupgrade-replacement.man
+   microsoft-certificateservices-webenrollment-serverupgrade-replacement.man
+   microsoft-hyper-v-client-migration-replacement.man
+   microsoft-hyper-v-drivers-migration-replacement.man
+   microsoft-hyper-v-migration-replacement.man
+   microsoft-onecore-tiledatarepository-replacement.man
+   microsoft-windows-advertisingid-replacement.man
+   microsoft-windows-coresystem-initmachineconfig-replacement.man
+   microsoft-windows-credentialmanagementrole-replacement.man
+   microsoft-windows-credentialmanagementrole-tools-replacement.man
+   microsoft-windows-deployment-services-admin-pack-replacement.man
+   microsoft-windows-deviceaccess-replacement.man
+   microsoft-windows-enterprisemgmt-replacement.man
+   microsoft-windows-errorreportingcore-replacement.man
+   microsoft-windows-errorreportingfaults-replacement.man
+   microsoft-windows-failovercluster-adminpak-replacement.man
+   microsoft-windows-familysafety-refreshtask-replacement.man
+   microsoft-windows-fax-service-replacement.man
+   microsoft-windows-feedback-service-replacement.man
+   microsoft-windows-flighting-settings.replacement.man
+   microsoft-windows-geolocation-replacement.man
+   microsoft-windows-identity-foundation-migration-replacement.man
+   microsoft-windows-ie-adminkitbranding-repl.man
+   microsoft-windows-ie-clientnetworkprotocolimplementation-repl.man
+   microsoft-windows-ie-internetexplorer-repl-2.man
+   microsoft-windows-ie-internetexplorer-repl.man
+   microsoft-windows-ie-pdm-replacement.man
+   microsoft-windows-ime-traditional-chinese-core-replacement.man
+   microsoft-windows-netfx35cdfcomp-replacement.man
+   microsoft-windows-netfxcorecomp-repl.man
+   microsoft-windows-network-setup-replacement.man
+   microsoft-windows-networkbridge-replacement.man
+   microsoft-windows-networkcontroller-framework-replacement.man
+   microsoft-windows-offlinefiles-replacement.man
+   microsoft-windows-powershell-replacement.man
+   microsoft-windows-powershell-ws08-replacement.man
+   microsoft-windows-powershellwebaccess-commands-powershell-migration-replacement.man
+   microsoft-windows-rmapi-replacement.man
+   microsoft-windows-securestartup-filterdriver-replacement.man
+   microsoft-windows-security-ngc-credprov-replacement.man
+   microsoft-windows-security-ngc-ctnrsvc-repl.man
+   microsoft-windows-servermanager-rsat-featuretools-replacement.man
+   microsoft-windows-servermanager-rsat-replacement.man
+   microsoft-windows-servermanager-rsat-roletools-replacement.man
+   microsoft-windows-servermanager-shell-replacement.man
+   microsoft-windows-services-targetedcontent-replacement.man
+   microsoft-windows-slb-mux-replacement.man
+   microsoft-windows-smb1-replacement.man
+   microsoft-windows-softwareinventorylogging-scheduledtasks-replacement.man
+   microsoft-windows-storagemigration-od-replacement.man
+   microsoft-windows-storagemigration-replacement.man
+   microsoft-windows-sxs-replacement.man
+   microsoft-windows-unified-telemetry-client-replacement.man
+   microsoft-windows-virtualization-vmswitch-migration-replacement.man
+   microsoft-windows-wcfcorecomp-replacement.man
+   microsoft-windows-workstationservice-replacement.man
+   microsoft.windows.com.complus.setup-replacement.man
+   microsoft.windows.com.dtc.setup-replacement.man
+   microsoftwindowsdefragcore-replacement.man
+   mmdeviceapi-migration-replacement.man
+   mmsys-migration-replacement.man
+   mpr-replacement.man
+   msmpeg2vdec-migration-replacement.man
+   muisettings-replacement.man
+   mup-replacement.man
+   nchostagent-replacement.man
+   ndis-repl.man
+   netfx-wcf-http-activation-replacement.man
+   netfx-wcf-msmqactivation-registration-replacement.man
+   netfx-wcf-pipeactivation-registration-replacement.man
+   netfx-wcf-tcpactivation-registration-replacement.man
+   netfx3-replacement.man
+   netfx4-policy-replacement.man
+   netfx4-replacement.man
+   netfx4-wcf-client-replacement.man
+   netfx4-wcf-extended-replacement.man
+   netfx4clientcorecomp-replacement.man
+   networking-mpssvc-svc.replacement.man
+   networkloadbalancingmanagementclient-replacement.man
+   networkloadbalancingmanagementheadlessserver-replacement.man
+   networkprofile-replacement.man
+   networksecurity.replacement.man
+   nfs-admincore-repl.man
+   nfs-clientcore-repl.man
+   nfs-servercore-repl.man
+   nfs-servercoreupg-clientcore-repl.man
+   nfs-servercoreupg-servercore-repl.man
+   ngclocalaccountmigplugin-replacement.man
+   ngcpopkeysrv_dll-repl.man
+   nlasvc-replace.man
+   notepad-repl.man
+   npas-role-replacement.man
+   npsui-replacement.man
+   odbc32dll-repl.man
+   onecore_speechcommon-rep.man
+   openssh-common-components-onecore-replacement.man
+   openssh-server-components-onecore-replacement.man
+   pcpksp_dll-repl.man
+   peerdist-client-migration-replacement.man
+   peerdist-server-migration-replacement.man
+   peerdist-upgrade-replacement.man
+   performancecounterinfrastructurenonexecutable-replacement.man
+   personalizationcsp-repl.man
+   pnpmigration-replacement.man
+   posproviders-replacement.man
+   power-energyestimationengine-replacement.man
+   powercpl-replacement.man
+   powermanagement-powerpolicy-definitions-replacement-v1019h1.man
+   powermanagement-powerpolicy-definitions-replacement-v1119h1.man
+   powermanagement-powerpolicy-definitions-replacement-v12vb.man
+   powermanagement-powerpolicy-definitions-replacement-v13vb.man
+   powermanagement-powerpolicy-definitions-replacement-v16sv1sv2.man
+   powermanagement-powerpolicy-definitions-replacement-v4rs1.man
+   powermanagement-powerpolicy-definitions-replacement-v5rs1.man
+   powermanagement-powerpolicy-definitions-replacement-v6rs2.man
+   powermanagement-powerpolicy-definitions-replacement-v7rs2.man
+   powermanagement-powerpolicy-definitions-replacement-v8rs4.man
+   powermanagement-powerpolicy-definitions-replacement-v9rs5.man
+   powermanagement-powerpolicy-definitions-replacement-vista.man
+   powermanagement-powerpolicy-definitions-replacement-win10.man
+   powermanagement-powerpolicy-definitions-replacement-win7.man
+   powermanagement-powerpolicy-definitions-replacement-win8.man
+   powermanagement-powerpolicy-migration-replacement.man
+   printing-localprinting-replacement.man
+   printing-server-foundation-features-upgrade.man
+   printing-servercore-wow64-rm.man
+   printing-spooler-core-replacement.man
+   processmodel-cpt-rm.man
+   profsvcreplacement.man
+   propsys-replacement.man
+   quickactions-windows-replacement.man
+   rasapi-repl.man
+   rasbase-rassstp-repl.man
+   rasbase-repl.man
+   rasddm-repl.man
+   rasmanservice-repl.man
+   rasmanservice-replv2.man
+   rasmanservice-replv3.man
+   rasppp-repl.man
+   rasrqs-repl.man
+   rasserver-repl.man
+   rasserveradmintools-replacement.man
+   refs-replacement.man
+   refs-v1-replacement.man
+   retaildemo.deployment.replacement.man
+   rights-management-client-v1-api-replacement.man
+   rights-management-services-admin-tools-replacement.man
+   rights-management-services-management-tools-replacement.man
+   rights-management-services-role-replacement.man
+   schedsvc-replacement.man
+   security-malware-windows-defender-repl.man
+   security-spp-migration-replacement.man
+   securitycenter-core-replacement.man
+   servercore-wow64-rm.man
+   settingshandlers_accessibility-replacement.man
+   sharedpccsp-repl.man
+   sharemgmt-rsatclient-tools-replacement.man
+   shell32-replacement.man
+   shmig-replacement.man
+   shutdown-event-tracker-repl.man
+   signalmanager-replacement.man
+   signature-replacement.man
+   smartcardsubsystem-repl.man
+   smsroutersvc-replacement.man
+   snippingtoolsettingsmigration-replacement.man
+   snmp-gui-tools-replacement.man
+   sounds-migration-replacement.man
+   spectrum-replacement.man
+   srm-cbadriver-repl.man
+   srm-datascrndriver-repl.man
+   srm-infrastructure-repl.man
+   srm-management-repl.man
+   srm-quotadriver-repl.man
+   srm-service-repl.man
+   srm-service-reports-repl.man
+   srm-ui-repl.man
+   srumon-replacement.man
+   starttiledata-replacement.man
+   storsvc-replacement.man
+   sysdm-replacement.man
+   sysmain-replacement.man
+   systemsettingsthreshold-replacement.man
+   systemsettings_handlers_cortana-replacement.man
+   tabletpcplatforminput-core-replacement.man
+   tcblaunch-replacement.man
+   tcpip-replacement.man
+   terminalservices-appserver-licensing-replacement.man
+   terminalservices-gateway-package-r-replacement.man
+   terminalservices-gateway-package-replacement.man
+   terminalservices-gateway-ui-package-r-replacement.man
+   terminalservices-gateway-ui-package-replacement.man
+   terminalservices-licenseserver-replacement.man
+   terminalservices-localsessionmanager-replacement.man
+   terminalservices-publishing-wmiprovider-replacement.man
+   terminalservices-rapweb-replacement.man
+   terminalservices-rapwebpart-replacement.man
+   terminalservices-rdp-winstationextensions-replacement.man
+   terminalservices-remoteconnectionmanager-replacement.man
+   terminalservices-role-package-r-replacement.man
+   terminalservices-role-package-replacement.man
+   terminalservices-sessiondirectory-client-replacement.man
+   terminalservices-sessiondirectory-server-replacement.man
+   terminalservices-tsv-vmhostagent-replacement.man
+   tetheringservice-repl.man
+   textservicesframework-migration-replacement.man
+   time-service-replacement.man
+   tpmdriverwmi-replacement.man
+   tpmvsc-repl.man
+   twinui-replacement.man
+   twinui.pcshell-replacement.man
+   udfs-replacement.man
+   updateagent-replacement.man
+   updateservices-common-replacement.man
+   updateservices-services-replacement.man
+   upnpdevicehost-replacement.man
+   upnpdevicehost-server-replacement.man
+   upnpssdp-replacement.man
+   upnpssdp-server-replacement.man
+   usbmigration-replacement.man
+   userchoiceprotection-replacement.man
+   vault-replacement.man
+   video-tvvideocontrol-replacement.man
+   virtualdiskservice-repl.man
+   volsnap-repl.man
+   volumecontrol.replacement.man
+   vssservice-repl.man
+   wbiosrvc-replacement.man
+   wcf-http-activation-replacement.man
+   wcf-nonhttp-activation-replacement.man
+   web-services-for-management-core-replacement.man
+   webdavredir-clientonly-replacement.man
+   webdavredir-serveronly-replacement.man
+   wia-coreservices-replacement.man
+   wicamigrationav-rl.man
+   wid8-migration.man
+   win32k-settings-repl.man
+   windows-secdriver-rep.man
+   windows-secwfpdriver-rep.man
+   windows-senseclient-service-rep.man
+   windows.cortana.desktop-repl.man
+   windows.holographic.displaythrottling-replacement.man
+   windows.media-migration-replacement.man
+   windows.sharedpc.accountmanager-repl.man
+   windows.storage-replacement.man
+   windows.ui.shell-repl.man
+   windowspushnotifications-platform-library-replacement.man
+   windowssearchengine-replacement.man
+   windowsstoreapi-replacement.man
+   windowsupdate-replacement.man
+   windowswebapphost-replacement.man
+   winlogon-replacement.man
+   winmde-migration-replacement.man
+   winnat-replacement.man
+   winsat-cmi-replacement.man
+   wlidsvc-replacement.man
+   wlidsvc.vista-win7.man
+   wmdmigration-replacement.man
+   wmi-core-replacement.man
+   wmiacpi-replacement.man
+   wmpnsservice-migration-replacement.man
+   wmpplayer-migration-replacement.man
+   wsinfra-other-mw-replacement.man
+   wsinfra-upgrade-replacement.man
+   wwansvc-servercfg-repl.man
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\hwvid-migration-2\.
+   hwvidmigplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-activedirectory-webservices\.
+   adwsmigrate.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-azurestack-hci-plugin\.
+   azshcimigplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-client-license-platform-service-migration\.
+   clipmigplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-edge-migration-plugin\.
+   edgemigrationplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-onecore-tiledatarepository\.
+   tilestoremigrationplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-appmanagement-migration\.
+   appmanmigrationplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-appx-deployment-server\.
+   appxprovisioning.xml
+   appxupgrademigrationplugin.dll
+   microsoft.windows.secondarytileexperience_10.0.0.0_neutral__cw5n1h2txyewy.xml
+   windows.miracastview_6.3.0.0_neutral_neutral_cw5n1h2txyewy.xml
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-audio-mmecore-other\.
+   audmigplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\Microsoft-Windows-ClusterUpgradePlugin\.
+   ClusterUpgradePlugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-com-complus-setup\.
+   commig.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-deviceassociationframeworkmigration\.
+   dafmigplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-directoryservices-adam-client\.
+   adammigrate.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-diskmonitor\.
+   diskmonmigplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-iis-rm\.
+   iismig.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-mapscontrol-migration\.
+   mapsmigplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-mup\.
+   mupmigplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-network-setup\.
+   netsetupapi.dll
+   netsetupengine.dll
+   networkbindingenginemigplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-offlinefiles-core\.
+   cscmig.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-offlinefiles-core\en-us\.
+   cscmig.dll.mui
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-pnpmigration\.
+   pnpmig.dll
+   pnpmig.inf
+   servicingcommon.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-rasapi-mig\.
+   pbkmigr.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-rasserver-migplugin\.
+   rasmigplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-security-ngc-localaccountmigplugin\.
+   ngclocalaccountmigplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-shmig\.
+   shmig.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-shmig\en-us\.
+   shmig.dll.mui
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-sxs\.
+   servicingcommon.dll
+   sxsmigplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-sxs\en-us\.
+   sxsmigplugin.dll.mui
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-terminalservices-appserver-licensing\.
+   tsmigplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-terminalservices-licenseserver\.
+   tlsrepplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-textservicesframework-migration\.
+   chxmig.dll
+   imjpmig.dll
+   imkrmig.dll
+   msctfmig.dll
+   tabletextservicemig.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-virtualization-vmswitch\.
+   vmswitchmigrationplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\microsoft-windows-vsmkey\.
+   VsmKeyMigPlugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\networkbridge\.
+   bridgemigplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\networking-mpssvc-svc\.
+   icfupgd.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\printing-localprinting-replacement\.
+   apmonportmig.dll
+   usbportmig.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\sppmig\.
+   sppmig.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\replacementmanifests\windowssearchengine\.
+   wsearchmigplugin.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\sxs\.
+   Microsoft-Windows-InternetExplorer-Optional-Package~31bf3856ad364e35~amd64~en-US~.cab
+   microsoft-windows-internetexplorer-optional-package~31bf3856ad364e35~amd64~~.cab
+   microsoft-windows-netfx3-ondemand-package~31bf3856ad364e35~amd64~~.cab
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\uup\.
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\uup\metadata\.
+   desktoptargetcompdb_conditions.xml.cab
+   desktoptargetcompdb_fod_neutral.xml.cab
+   desktoptargetcompdb_neutral.xml.cab
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\vi-vn\.
+   MediaSetupUIMgr.dll.mui
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\_manifest\.
+
+Directory: C:\Users\N07773\Desktop\New folder\sources\_manifest\spdx_2.2\.
+   manifest.spdx.cose
+   manifest.spdx.json
+   manifest.spdx.json.sha256
+
+Directory: C:\Users\N07773\Desktop\New folder\support\.
+
+Directory: C:\Users\N07773\Desktop\New folder\support\logging\.
+   actionqueueetw.dll
+   auditetw.dll
+   cmisetupetw.dll
+   etwproviderinstall.vbs
+   microsoft-windows-actionqueue-instrumentation.man
+   microsoft-windows-audit-instrumentation.man
+   microsoft-windows-cmisetup-instrumentation.man
+   microsoft-windows-oobeldr-instrumentation.man
+   microsoft-windows-setup-events.man
+   microsoft-windows-setup-instrumentation.man
+   microsoft-windows-setupcl-instrumentation.man
+   microsoft-windows-setupugc-instrumentation.man
+   microsoft-windows-sysprep-instrumentation.man
+   microsoft-windows-windeploy-instrumentation.man
+   oobeldretw.dll
+   setupcletw.dll
+   setupetw.dll
+   setupugcetw.dll
+   sysprepetw.dll
+   windeployetw.dll
+   winsetupetw.dll
+
+Directory: C:\Users\N07773\Desktop\New folder\support\logging\en-us\.
+   actionqueueetw.dll.mui
+
+=====================================
+           SUMMARY
+=====================================
+
+
+Total number of files: 964
+
+File types discovered:
+
+adml: 1
+admx: 1
+bin: 4
+bmp: 2
+cab: 6
+cat: 1
+cer: 1
+cfg: 3
+cip: 3
+com: 1
+cose: 1
+dat: 8
+dll: 209
+efi: 5
+exe: 14
+gif: 2
+hiv: 2
+htm: 1
+inf: 27
+ini: 3
+json: 1
+man: 523
+mof: 2
+mui: 58
+nls: 1
+p7b: 1
+rtf: 3
+sdb: 1
+sdi: 1
+stl: 1
+sys: 3
+ttf: 41
+txt: 8
+vbs: 2
+wim: 2
+xml: 15
+xsl: 6
+
+=====================================
+         FILE HASH DETAILS
+=====================================
+
+SHA256 hash of final_temp_output.txt:
+ac627713d95023158d8a866768c7599853aa058a140d6518ba7252947945b949
+CertUtil: -hashfile command completed successfully.
+
